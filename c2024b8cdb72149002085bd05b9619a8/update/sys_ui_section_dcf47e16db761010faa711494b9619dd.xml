@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="" section_id="dcf47e16db761010faa711494b9619dd" sys_domain="global" table="x_anbib_survey_setup" version="3" view="">
+        <sys_ui_annotation action="INSERT_OR_UPDATE">
+            <is_plain_text>false</is_plain_text>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:12</sys_created_on>
+            <sys_id>ab16475edb7a1010faa711494b9619e7</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:12</sys_updated_on>
+            <text>Click survey setup is used for reusable configurations that can be used for OneClick survey functionality. There can be only one question (metric) and value for which the OneClick will act. If any other metrics needs to be filled, it has to be included as inline metrics. Inline metrics will be presented as normal question in the survey.</text>
+            <type display_value="Info Box Blue">753f88a80f930000b12e6903cfe01206</type>
+        </sys_ui_annotation>
+        <sys_ui_annotation action="INSERT_OR_UPDATE">
+            <is_plain_text>false</is_plain_text>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:12</sys_created_on>
+            <sys_id>e316475edb7a1010faa711494b9619e8</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:12</sys_updated_on>
+            <text>OneClick metric</text>
+            <type display_value="Section Separator">443e806c0fd30000b12e6903cfe01281</type>
+        </sys_ui_annotation>
+        <sys_ui_annotation action="INSERT_OR_UPDATE">
+            <is_plain_text>false</is_plain_text>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:12</sys_created_on>
+            <sys_id>a716475edb7a1010faa711494b9619e8</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:12</sys_updated_on>
+            <text>Inline metrics</text>
+            <type display_value="Section Separator">443e806c0fd30000b12e6903cfe01281</type>
+        </sys_ui_annotation>
+        <sys_ui_annotation action="INSERT_OR_UPDATE">
+            <is_plain_text>false</is_plain_text>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:12</sys_created_on>
+            <sys_id>6b16475edb7a1010faa711494b9619e8</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:12</sys_updated_on>
+            <text>On Completion</text>
+            <type display_value="Section Separator">443e806c0fd30000b12e6903cfe01281</type>
+        </sys_ui_annotation>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>ab16475edb7a1010faa711494b9619e7</element>
+            <position>0</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3716479edb7a1010faa711494b961978</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>annotation</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>name</element>
+            <position>1</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>bb16479edb7a1010faa711494b961978</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>asmt_metric_type</element>
+            <position>2</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3316479edb7a1010faa711494b961979</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>asmt_key</element>
+            <position>3</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b716479edb7a1010faa711494b961979</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>e316475edb7a1010faa711494b9619e8</element>
+            <position>4</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3f16479edb7a1010faa711494b961979</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>annotation</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.begin_split</element>
+            <position>5</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b316479edb7a1010faa711494b96197a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.begin_split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>click_metric</element>
+            <position>6</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3b16479edb7a1010faa711494b96197a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>7</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>bf16479edb7a1010faa711494b96197a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>click_value</element>
+            <position>8</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3716479edb7a1010faa711494b96197b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.end_split</element>
+            <position>9</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>bb16479edb7a1010faa711494b96197b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.end_split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>click_message</element>
+            <position>10</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3316479edb7a1010faa711494b96197c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>a716475edb7a1010faa711494b9619e8</element>
+            <position>11</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b716479edb7a1010faa711494b96197c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>annotation</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.begin_split</element>
+            <position>12</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3f16479edb7a1010faa711494b96197c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.begin_split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>save_without_inline</element>
+            <position>13</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b316479edb7a1010faa711494b96197d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>14</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3b16479edb7a1010faa711494b96197d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>show_inline_metric</element>
+            <position>15</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>bf16479edb7a1010faa711494b96197d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>inline_metrics</element>
+            <position>16</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3716479edb7a1010faa711494b96197e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.end_split</element>
+            <position>17</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>bb16479edb7a1010faa711494b96197e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>.end_split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>inline_message</element>
+            <position>18</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3316479edb7a1010faa711494b96197f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>6b16475edb7a1010faa711494b9619e8</element>
+            <position>19</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b716479edb7a1010faa711494b96197f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type>annotation</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>success_message</element>
+            <position>20</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3f16479edb7a1010faa711494b96197f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>error_message</element>
+            <position>21</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>b316479edb7a1010faa711494b961980</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>show_complete_survey</element>
+            <position>22</position>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 14:14:13</sys_created_on>
+            <sys_id>3b16479edb7a1010faa711494b961980</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="NULL" display_value="" name="x_anbib_survey_setup" sys_domain="global" view="Default view">dcf47e16db761010faa711494b9619dd</sys_ui_section>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 14:14:13</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption/>
+            <header>false</header>
+            <name>x_anbib_survey_setup</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 12:59:10</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>dcf47e16db761010faa711494b9619dd</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_anbib_survey_setup</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+            <sys_update_name>sys_ui_section_dcf47e16db761010faa711494b9619dd</sys_update_name>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 12:59:10</sys_updated_on>
+            <sys_user/>
+            <title>true</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

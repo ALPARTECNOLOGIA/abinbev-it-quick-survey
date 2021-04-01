@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_anbib_survey.QuickSurveyHelper</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>QuickSurveyHelper</name>
+        <script><![CDATA[var QuickSurveyHelper = Class.create();
+QuickSurveyHelper.prototype = {
+	initialize: function() {
+
+	},
+	persistence : new QuickSurveyPersistence(),
+	logs: new global.LogGenerator("itsm", "[GLOBAL] - QuickSurveyHelper"),
+
+	getQuickSurveyUrl: function (record, configId) {
+		try{
+			var survey = this.persistence.getRecordSurvey(record);
+			this.logs.addInfo(record.getUniqueValue(), "[getRequestorData] ERROR");
+			var grConfig = this.persistence.getQuickSurveyUrl(survey, configId);
+			if (!grConfig || !survey) {
+				var errorMessage = 'Unable to find config object.' +
+					' Record: ' + record +
+					' - ConfigId: ' + configId;
+				this.logs.addInfo(errorMessage, "[getRequestorData] ERROR");
+			} else {
+				configId = grConfig.getUniqueValue();
+			}
+
+			this.logs.execute();
+			return '/x_anbib_survey_QuickSurvey.do?' +
+				'sysparm_survey_id=' + survey.getUniqueValue() + '&' +
+				'sysparm_survey_config=' + configId;
+		} catch(ex){
+			this.logs.addInfo(ex, "[getQuickSurveyUrl] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	configRecordSanityCheck: function (currentGr) {
+		try{
+			currentGr = currentGr || current;
+			if (currentGr.isNewRecord())
+				return;
+
+			var sanityCheck = {
+				assessmentMetricValid: 'Assessment type metric is invalid',
+				assessmentMetricActive: 'Assessment type metric is inactive',
+				clickMetricValid: 'One click metric is invalid',
+				clickMetricValidAssessment: 'One click metric does not belong to the assessment metric',
+				clickMetricActive: 'One click metric is inactive',
+				clickMetricValue: 'One click value does not comply to the one click metric type',
+				inlineMetricsValid: 'One or more of the inline metrics are invalid',
+				inlineMetricValidAssessment: 'One or more inline metrics does not belong to the assessment metric',
+				inlineMetricsActive: 'One or more of the inline metrics are inactive'
+
+			};
+			/*
+		Assessment metric sanity check
+		*/
+			var assmtMetricId = this.persistence.getGrValue(currentGr, 'asmt_metric_type');
+			var assmtMetric = this.persistence.getGrRefRecord(currentGr, 'asmt_metric_type');
+			if (assmtMetric.isValidRecord()) {
+				delete sanityCheck.assessmentMetricValid;
+
+				if (this.persistence.getGrValue(assmtMetric, 'active'))
+					delete sanityCheck.assessmentMetricActive;
+			}
+			/*
+		Click metric sanity check
+		*/
+			var clickMetric = this.persistence.getGrRefRecord(currentGr, 'click_metric');
+			if (clickMetric.isValidRecord()) {
+				delete sanityCheck.clickMetricValid;
+
+				if (this.persistence.getGrValue(clickMetric, 'metric_type') == assmtMetricId)
+					delete sanityCheck.clickMetricValidAssessment;
+
+				if(this.persistence.getGrValue(clickMetric, 'active'))
+					delete sanityCheck.clickMetricActive;
+
+				switch (this.persistence.getGrValue(clickMetric, 'datatype')) {
+					case 'long':
+					case 'numericscale':
+					case 'percentage':
+					case 'rating':
+					case 'scale':
+						if (!isNaN(this.persistence.getGrValue(currentGr, 'click_value')))
+							delete sanityCheck.clickMetricValue;
+						break;
+				}
+			}
+			/*
+		Inline metrics sanity check
+		*/
+			var inlinesValid = true, inlinesValidAssessment = true, inlinesActive = true;
+			if (this.persistence.getGrValue(currentGr, 'show_inline_metric')) {
+				var inlineMetrics = this.persistence.getGrValue(currentGr, 'inline_metrics');
+				inlineMetrics = inlineMetrics.split(',');
+
+				var inlines = this.persistence.getInlineMetricData(inlineMetrics, assmtMetricId);
+			}
+			if (inlines.valid)
+				delete sanityCheck.inlineMetricsValid;
+			if (inlines.validAssessment)
+				delete sanityCheck.inlineMetricValidAssessment;
+			if (inlines.active)
+				delete sanityCheck.inlineMetricsActive;
+
+			/*
+		Return sanity check
+		*/
+			return sanityCheck;
+		}catch(ex){
+			this.logs.addInfo(ex, "[configRecordSanityCheck] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	initSurveyConfig: function (surveyId, configId) {
+		try{
+			var grAssmtIn = this.persistence.getSurveyGr(surveyId);
+			var grAssmtConfig = this.persistence.getConfigGr(configId);
+			var surveyStatusObj = this.persistence.getSurveyStatusObj(grAssmtIn, grAssmtConfig);
+			surveyStatusObj.survey.reasonChoices = this._getReasonChoices(surveyId, configId, surveyStatusObj.survey.click_value);
+			this._preprocessSurveyConfig(surveyStatusObj);
+			return surveyStatusObj;
+		}catch(ex){
+			this.logs.addInfo(ex, "[initSurveyConfig] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	saveData: function(surveyId,configId,comment,reasonChoices){
+		try{
+			var grAssmtIn = this.persistence.getSurveyGr(surveyId);
+			var grAssmtConfig = this.persistence.getConfigGr(configId);
+			var incidentSurvey = gs.getProperty('incident_satisfatory_survey');
+			var commentMetric;
+			var reasonChoicesMetric;
+			//check if is Incident Survey or Requested Item Survey
+			if(grAssmtConfig.asmt_metric_type == incidentSurvey){ 
+				commentMetric = gs.getProperty('x_anbib_survey.comment_metric_incidentSurvey');
+				reasonChoicesMetric = gs.getProperty('x_anbib_survey.reasons_metric_incidentSurvey');
+			}
+			else{
+				commentMetric = gs.getProperty('x_anbib_survey.comment_metric_reqItemSurvey');
+				reasonChoicesMetric = gs.getProperty('x_anbib_survey.reasons_metric_reqItemSurvey');
+			}
+
+			var ret = {
+				commentSubmitted : this.persistence.saveComment(grAssmtIn,comment,commentMetric),
+				choicesSubmitted : this.persistence.saveChoices(grAssmtIn,grAssmtConfig,reasonChoices,reasonChoicesMetric)
+			};
+
+			return ret;
+
+		}catch(ex){
+			this.logs.addInfo(ex, "[saveData] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	saveSurveyInstance: function (surveyId, valueObj) {
+		try{
+			var response = this.persistence.saveSurveyInstance(surveyId, valueObj);
+			return response;
+		}catch(ex){
+			this.logs.addInfo(ex, "[saveSurveyInstance] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	reopenSurveyInstance: function (surveyId) {
+		try{
+			var response = this.persistence.reopenSurveyInstance(surveyId);
+			return response;
+		}catch(ex){
+			this.logs.addInfo(ex, "[reopenSurveyInstance] ERROR");
+			this.logs.execute();
+		}
+	},
+	
+	_getReasonChoices: function (surveyId, configId, clickValue) {
+		try{
+				if(clickValue != '9' && clickValue != '10')
+					ret = this._getNegativeReasons();
+				else
+					ret = this._getPositiveReasons();
+
+			return ret;
+
+		}catch(ex){
+			this.logs.addInfo(ex, "[getReasonChoices] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	_getNegativeReasons : function(){
+		try{
+			var negativeChoices= gs.getProperty('x_anbib_survey.negativeChoices');
+			negativeChoices = JSON.parse(negativeChoices);
+			var negativeReasons = {
+				choices : [],
+				question : gs.getMessage(negativeChoices.question)
+			};
+
+
+			var allChoices = negativeChoices.choices;
+
+			for(choice in allChoices){
+
+				var obj = {};
+				var choiceObj = allChoices[choice];
+
+				for(field in choiceObj){
+					if(field == 'value')
+						obj[field] = parseInt(choiceObj[field]);
+					else if(field == 'display' || field == 'description')
+						obj[field] = gs.getMessage(choiceObj[field]);
+					else
+						obj[field] = choiceObj[field];
+					
+					obj.selected = false;
+				}
+
+				negativeReasons.choices.push(obj);
+
+			}
+
+			return negativeReasons;
+		}catch(ex){
+			this.logs.addInfo(ex, "[_getNegativeReasons] ERROR");
+			this.logs.execute();
+		}
+	},
+
+	_getPositiveReasons : function(){
+		try{
+			var positiveChoices= gs.getProperty('x_anbib_survey.positiveChoices');
+			positiveChoices = JSON.parse(positiveChoices);
+			var positiveReasons = {
+				choices : [],
+				question : gs.getMessage(positiveChoices.question)
+			};
+
+
+			var allChoices = positiveChoices.choices;
+
+			for(choice in allChoices){
+
+				var obj = {};
+				var choiceObj = allChoices[choice];
+
+				for(field in choiceObj){
+					if(field == 'value')
+						obj[field] = parseInt(choiceObj[field]);
+					else if(field == 'display' || field == 'description')
+						obj[field] = gs.getMessage(choiceObj[field]);
+					else
+						obj[field] = choiceObj[field];
+					
+					obj.selected = false;
+				}
+
+				positiveReasons.choices.push(obj);
+
+			}
+
+			return positiveReasons;
+		}catch(ex){
+			this.logs.addInfo(ex, "[_getPositiveReasons] ERROR");
+			this.logs.execute();
+		}
+	},
+	_preprocessSurveyConfig: function (surveyStatusObj) {
+
+		try{
+			var survey = surveyStatusObj.survey;
+			var config = surveyStatusObj.config;
+			var error = surveyStatusObj.error;
+			var inlines = surveyStatusObj.inlines;
+
+			var valueObj = {};
+			valueObj[config.click_metric] = config.click_value;
+
+			if (error)
+				return false;
+			if (config.save_without_inline) {
+				this.saveSurveyInstance(survey.id, valueObj);
+			}
+			if (!inlines || !inlines.length) {
+				this.saveSurveyInstance(survey.id, valueObj);
+				surveyStatusObj.completed = true;
+			}
+		}catch(ex){
+			this.logs.addInfo(ex, "[_preprocessSurveyConfig] ERROR");
+			this.logs.execute();
+		}
+	},
+
+
+	type: 'QuickSurveyHelper'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-24 09:44:20</sys_created_on>
+        <sys_id>14bef84adbb694d0faa711494b961917</sys_id>
+        <sys_mod_count>52</sys_mod_count>
+        <sys_name>QuickSurveyHelper</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_script_include_14bef84adbb694d0faa711494b961917</sys_update_name>
+        <sys_updated_by>pedro.torres@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2021-03-10 14:31:20</sys_updated_on>
+    </sys_script_include>
+</record_update>

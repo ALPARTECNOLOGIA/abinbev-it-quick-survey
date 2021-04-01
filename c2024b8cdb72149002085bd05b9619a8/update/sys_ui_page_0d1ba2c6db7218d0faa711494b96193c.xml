@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[/*
+	The query parameters are mapped as follows to Jelly JSON 'jvar_survey'
+	sysparm_survey_id: survey_id
+	sysparm_survey_metric: survey_metric
+	sysparm_survey_value: survey_value
+*/
+
+var surveyApp = angular.module('oneClickSurvey', []);
+surveyApp.controller('oneClickSurveyCtrl', function ($scope) {
+
+	/* Global operations */
+	var getObjectFromString = function (string) {
+		try {
+			return JSON.parse(string);
+		} catch (e) {
+			return string;
+		}
+	};
+	var getStringFromObject = function (obj) {
+		try {
+			return JSON.stringify(obj);
+		} catch (e) {
+			return obj;
+		}
+	};
+
+	var copyObject = function (src, target) {
+		target = target || {};
+		for (var o in src) {
+			if (src[o] instanceof Array)
+				target[o] = getObjectFromString(getStringFromObject(src[o])); // Replace entire Array
+			else if (typeof src[o] == 'object')
+				target[o] = copyObject(src[o], target[o]);
+			else
+				target[o] = src[o];
+		}
+		return target;
+	};
+
+	var gAjaxProcessorName = 'x_anbib_survey.QuickSurveyAjax';
+	var gAjaxProcessorMethod = 'callMethod';
+	var gAjaxCall = function (method, input, callback) {
+		var ga = new GlideAjax(gAjaxProcessorName);
+		ga.addParam('sysparm_name', gAjaxProcessorMethod);
+		ga.addParam('sysparm_method', method);
+		if (typeof input == 'object')
+			ga.addParam('sysparm_input', getStringFromObject(input));
+		else if (typeof input == 'string')
+			ga.addParam('sysparm_input', input);
+		ga.getXML(function (response) {
+			var answer = response.responseXML.documentElement.getAttribute('answer');
+			answer = getObjectFromString(answer);
+			if (callback && typeof callback == 'function') {
+				$scope.$apply(function () {
+					callback(answer);
+				});
+			}
+		});
+	};
+
+	/* Styler functions */
+	var removeTimingInfo = function (doc) {
+		doc = doc || document;
+		var target = doc.querySelector('body');
+		var observer = new MutationObserver(function(mutations) {
+			mutations.forEach(function(mutation) {
+				if (mutation.type == 'childList') {
+					for (var i = 0; i < mutation.addedNodes.length; i++) {
+						if ($j(mutation.addedNodes[i]).is('#page_timing_div')) {
+							$j(mutation.addedNodes[i]).css('display', 'none');
+							observer.disconnect();
+							break;
+						}
+					}
+				}
+			});
+		});
+		observer.observe(target, { childList: true });
+	};
+
+
+	/*
+	$scope.surveyParams = {
+	survey_id: '',
+	survey_config: ''
+	}
+	*/
+	$scope.surveyParams = getObjectFromString('$[jvar_survey]');
+	$scope.surveyParams.comment = '';
+	$scope.surveyParams.selectedReasonChoices = [];
+	$scope.reasonChoices;
+	$scope.reasonQuestion = '';
+
+	/* AngularJs Operations */
+	$scope.assessment = null;
+	$scope.inlineResponse = {};
+	$scope.takeToActualSurvey = false;
+
+	$scope.isLoading = false;
+
+	$scope.takeToSurvey = function (survey) {
+		survey = survey || $scope.surveyParams;
+		$scope.isLoading = true;
+
+		gAjaxCall('reopenSurvey', {
+			survey_id: $scope.assessment.survey.id
+		}, function (result) {
+			if (result.reopen_success) {
+				var path = '/assessment_take2.do?';
+				path += 'sysparm_assessable_sysid' + '=' + $scope.assessment.survey.id;
+				path += '&';
+				path += 'sysparm_assessable_type' + '=' + $scope.assessment.survey.metric;
+				var iframe = $j('#one_click_actual_survey');
+				iframe.on('load', function () {
+					removeTimingInfo(iframe[0].contentWindow.document);
+				});
+				iframe.attr('src', path);
+				$scope.takeToActualSurvey = true;
+			} else {
+				$scope.assessment = copyObject(result, $scope.assessment);
+			}
+			$scope.isLoading = false;
+		});
+	};
+
+	$scope.submitInlineSurvey = function () {
+		if ($scope.assessment.config.click_metric && $scope.assessment.config.click_value)
+			$scope.inlineResponse[$scope.assessment.config.click_metric] = $scope.assessment.config.click_value;
+
+		$scope.isLoading = true;
+		gAjaxCall('submitInlineSurvey', {
+			survey_id: $scope.assessment.survey.id,
+			survey_values: $scope.inlineResponse
+		}, function (result) {
+			$scope.assessment = copyObject(result, $scope.assessment);
+			$scope.isLoading = false;
+		});
+	};
+
+	$scope.oneClickCompleteSurvey = function (survey) {
+		if (survey) {
+			gAjaxCall('oneClickCompleteSurvey', survey, function (result) {
+				$scope.isLoading = false;
+				$scope.assessment = copyObject(result, $scope.assessment);
+				$scope.reasonChoices = $scope.assessment.survey.reasonChoices.choices;
+				$scope.reasonQuestion = $scope.assessment.survey.reasonChoices.question;
+			});
+		}
+	};
+
+	$scope.saveData = function(survey, hasError){
+		if(survey){
+			$scope.isLoading = true;
+			gAjaxCall('saveData', survey, function (result) {
+				if(result.commentSubmitted) $scope.assessment.survey.commentSubmitted = true;
+				if(result.choicesSubmitted) $scope.assessment.survey.reasonChoicesSubmitted = true;
+				if(hasError && $scope.assessment.error.code == 509) delete $scope.assessment.error;
+				$scope.isLoading = false;
+			});
+
+		}
+	};
+
+	$scope.selectReason = function(reasonChoice){
+		$scope.surveyParams.selectedReasonChoices = [];
+		reasonChoice.selected = !reasonChoice.selected;
+		$scope.reasonChoices.forEach(function(choice){
+			if(choice.selected) $scope.surveyParams.selectedReasonChoices.push(choice);
+		});
+
+	};
+
+	/* Initializer */
+	(function () {
+		$scope.isLoading = true;
+		removeTimingInfo();
+
+		/* Initial load */
+		$scope.oneClickCompleteSurvey($scope.surveyParams);
+	})();
+});]]></client_script>
+        <description>The UI Page uses one click complete assessment. There is an optional functionality to take up the survey completely if needed by redirecting to the actual survey page. teste.&#13;
+&#13;
+The URL to access the survey page is&#13;
+/x_anbib_survey_QuickSurvey.do&#13;
+&#13;
+with the parameters&#13;
+sysparm_survey_id=&lt;sys_id_of_the_survey_instance&gt;&#13;
+sysparm_survey_config=&lt;sys_id_of_the_setup_definition&gt;&#13;
+</description>
+        <direct>false</direct>
+        <endpoint>x_anbib_survey_QuickSurvey.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<div id="one-click-survey-op-e01" ng-app="oneClickSurvey" ng-controller="oneClickSurveyCtrl" ng-cloak="true" style="width: 100%; height: 100%;">
+
+		<style>
+			
+			@media only screen and (max-width: 500px) {
+				.reasonChoice {
+					width: 100% !important;
+				}
+			}
+
+			* { 
+			font-family: SourceSansPro, "Helvetica Neue", Arial;
+			}
+
+			.one_click_loader {
+			display: inline-block;
+			border: 1rem solid #f3f3f3;
+			border-top: 1rem solid #555;
+			border-radius: 50%;
+			width: 10rem;
+			height: 10rem;
+			animation: one_click_loader_spin 1.5s linear infinite;
+			}
+			@keyframes one_click_loader_spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+			}
+
+			.one_click_loader_container {
+			text-align: center;
+			margin: 2rem;
+			}
+
+			#one-click-survey-op-e01 ::placeholder {
+			color: #ddd;
+			}
+
+			.danger-color {
+			color: #E01111;
+			}
+			.newLayout{
+			background-color: #e6e6e6;
+			border-radius: 8px 8px 4px 4px;
+			padding-top: 25px;
+			}
+			.imgCenter {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 15px;
+			margin-bottom: 15px;
+			width: 100%;
+			height: auto;
+			max-width: 350px;
+			}
+			.footerNewLayout{
+			text-align: center;
+			}
+			.footerSpan{
+			font-size: 18px;
+			color: #000000;
+			font-weight: 1000;
+			letter-spacing: 2px;
+			}
+			.hrefIcons{
+			margin: 30px 0;
+			}
+			.linkIcons{
+			margin: 0 15px;
+			}
+			.surveyComments{
+			resize: none;
+			width: 80%;
+			height: 100px;
+			border: 1px solid #767676;
+			border-radius: 5px;
+			}
+			
+			textarea:focus{
+			border: 1px solid black;
+			}
+			
+			.labelSurveyComments{
+			font-size: 19px;
+			font-weight: bolder;
+			margin-bottom: 10px;
+			margin-top: 10px;
+			}
+			.btn-success{
+			border-color: #e6e6e6;
+			}
+			.btn-success:hover{
+			border: 1px solid black;
+			}
+
+			.reasonQuestion{
+			font-weight : bolder;
+			font-size : 19px;
+			}
+
+			.box{
+			border : 1px solid #b7b7b7;
+			border-radius: 4px;
+			padding: 10px;
+			cursor : pointer;
+			height: 100%;
+			}
+	
+			.reasonChoice{
+			margin-bottom : 5px;
+			padding: 0 8px;
+			}
+
+			.choiceIcon { 
+			font-size : 20px;
+			}
+
+			.selected {
+			color: #ffb300;  
+			}
+
+			#evaluationMessage{
+			font-size : 19px;
+			}
+			
+			.clickImg{
+			max-width: 100%;
+			height: auto;
+			}
+			
+			.sendIcon{
+			margin-left : 5px;
+			}
+			
+			.row-flx{
+			display: flex;
+			flex-wrap : wrap;
+			}
+
+
+		</style>
+
+		<!-- Initializer -->
+		<g2:evaluate var="jvar_survey" object="true">
+			var obj = {};
+			obj.survey_id = RP.getParameterValue("sysparm_survey_id");
+			obj.survey_config = RP.getParameterValue("sysparm_survey_config");
+			JSON.stringify(obj);
+		</g2:evaluate>
+
+		<div class="container" ng-show="!takeToActualSurvey" style="max-width: 700px;">
+			<img src="AB%20InBev_logo.jpg" width="352" height="64" class="imgCenter"/>
+			<div class="row newLayout">
+
+				<!-- Heading -->
+				<div class="col-xs-12 text-center">
+					<!--<div class="well well-sm">
+   <div class="h2">
+ ${gs.getMessage("Feedback Form")}
+   </div>
+ </div>-->
+				</div>
+
+				<!-- Loader -->
+				<div class="col-xs-12">
+					<div id="one_click_loader" class="one_click_loader_container" ng-show="isLoading">
+						<span class="one_click_loader"></span>
+					</div>
+				</div>
+
+				<!-- Errors -->
+				<div class="col-xs-12 text-center" ng-show="assessment.error $[AMP]$[AMP] !isLoading">
+					<!-- Error message -->
+					<!--<div class="h2"
+ ng-bind="assessment.config.messages.error_message">
+   </div>-->
+					<!-- Error object message -->
+					<div class="h3 danger-color" style="color: black; font-size: 19px;"
+						 ng-bind="assessment.error.message">
+					</div>
+					<div class="one_click_loader_container" ng-show="!assessment.survey.commentSubmitted $[AMP]$[AMP] !assessment.survey.reasonChoicesSubmitted $[AMP]$[AMP] !isLoading $[AMP]$[AMP] assessment.error.code == 509">
+						<img class="clickImg" ng-if="assessment.survey.click_value == 1" src="survey_very_not_satisfied.png"></img>
+						<img class="clickImg" ng-if="assessment.survey.click_value == 3" src="survey_not_satisfied.png"></img>
+						<img class="clickImg" ng-if="assessment.survey.click_value == 7" src="survey_ok.png"></img>
+						<img class="clickImg" ng-if="assessment.survey.click_value == 9" src="survey_satisfied.png"></img>
+						<img class="clickImg" ng-if="assessment.survey.click_value == 10" src="survey_very_satisfied.png"></img>
+						<br/>
+						<div id="allReasonsChoices">
+							<span class="reasonQuestion">{{reasonQuestion}}</span>
+							<br/>
+							<div class="row row-flx">        
+								<div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 reasonChoice" ng-repeat="choice in reasonChoices" ng-click="selectReason(choice)">
+									<div class="col-md-12 block box" ng-class="{selected : choice.selected}">
+										<i class="choiceIcon {{choice.icon}}"></i>
+										<h5><b>{{::choice.display}}</b></h5>
+										<h6>{{::choice.description}}</h6>              
+									</div>
+								</div>
+							</div>
+						</div>
+						<form name="commentForm">
+							<label id="labelSurveyCompleteComments" class="labelSurveyComments" for="surveyCompleteComments">${gs.getMessage("Please share any comments/feedback")}</label>
+							<textarea id="surveyCompleteComments" class="surveyComments" name="comment" ng-model="surveyParams.comment" ng-required="true"></textarea>
+						</form>
+						<br></br>
+						<div class="sendButton">
+						<button type="button" class="btn btn-success btn-lg" ng-disabled="commentForm.comment.$error.required $[AMP]$[AMP] surveyParams.selectedReasonChoices.length == 0" ng-click="saveData(surveyParams, true)">${gs.getMessage("Send")}<i class="sendIcon glyphicon glyphicon-send"></i></button>
+						</div>
+					</div>
+				</div>
+
+				<!-- One Click -->
+				<div class="col-xs-12 text-center" ng-show="!assessment.error $[AMP]$[AMP] !isLoading $[AMP]$[AMP] (assessment.survey.commentSubmitted || assessment.survey.reasonChoicesSubmitted)">
+
+					<!-- Click message -->
+					<!--<div class="h2 text-center"
+ ng-bind="assessment.config.messages.click_message">
+  </div>-->
+					<div class="h2 text-center">
+						<label>${gs.getMessage("Thank you for your answer!")}</label>
+						<br/>
+						<label style="max-width: 70%; font-size: 23px; color:black;">${gs.getMessage("Your feedback is very important to help us improve our service quality.")}</label>
+					</div>
+
+					<!-- Success message -->
+					<!--<div class="h2 text-center"
+ ng-if="assessment.completed"
+ ng-bind="assessment.config.messages.success_message">
+ </div> -->
+
+					<!-- Take to actual survey -->
+					<button id="one_click_take_to_actual_survey"
+							class="btn btn-default btn-lg"
+							style="margin: 3rem;"
+							ng-if="assessment.completed $[AMP]$[AMP] assessment.config.show_complete_survey"
+							ng-click="takeToSurvey()">
+						${gs.getMessage("Click to access the survey in detail")}
+					</button>
+
+					<!-- Inline Survey -->
+					<div class="inline-survey"
+						 ng-if="!assessment.completed $[AMP]$[AMP] assessment.inlines $[AMP]$[AMP] assessment.inlines.length">
+						<div class="h3" ng-bind="assessment.config.messages.inline_message"></div>
+						<form ng-submit="submitInlineSurvey()">
+							<div class="col-xs-12" ng-repeat="m in assessment.inlines">
+								<div ng-switch="m.datatype">
+									<div ng-switch-when="string">
+										<div ng-if="m.string_option == 'multiline'">
+											<textarea class="form-control"
+													  rows="2"
+													  ng-model="inlineResponse[m.id]"
+													  placeholder="{{m.name}}"
+													  style="resize: vertical;">
+											</textarea>
+										</div>
+										<div ng-if="m.string_option != 'multiline'">
+											<input type="text"
+												   class="form-control"
+												   placeholder="{{m.name}}"
+												   ng-model="inlineResponse[m.id]"/>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xs-12">
+								<button type="submit"
+										class="btn btn-primary pull-right"
+										style="margin: 10px; padding: .8rem 1.5rem;">
+									${gs.getMessage("Submit")}
+								</button>
+							</div>
+						</form>
+					</div>
+
+
+
+				</div>
+				<img src="cheers-logo.jpg" width="223" height="279" class="imgCenter" style="margin-top:80px;" ng-show="assessment.survey.commentSubmitted || assessment.survey.reasonChoicesSubmitted"/>
+				<div class="one_click_loader_container" ng-show="!assessment.survey.commentSubmitted $[AMP]$[AMP] !assessment.survey.reasonChoicesSubmitted $[AMP]$[AMP] !isLoading $[AMP]$[AMP] !assessment.error">
+					<b id="evaluationMessage"> ${gs.getMessage("Your survey score has been saved as : ")} </b>
+					<img class="clickImg" ng-if="assessment.survey.click_value == 1" src="survey_very_not_satisfied.png"></img>
+					<img class="clickImg" ng-if="assessment.survey.click_value == 3" src="survey_not_satisfied.png"></img>
+					<img class="clickImg" ng-if="assessment.survey.click_value == 7" src="survey_ok.png"></img>
+					<img class="clickImg" ng-if="assessment.survey.click_value == 9" src="survey_satisfied.png"></img>
+					<img class="clickImg" ng-if="assessment.survey.click_value == 10" src="survey_very_satisfied.png"></img>
+					<br/>
+					<div id="allReasonsChoices">
+						<span class="reasonQuestion">{{reasonQuestion}}</span>
+						<br/>
+						<div class="row row-flx">        
+							<div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 reasonChoice" ng-repeat="choice in reasonChoices" ng-click="selectReason(choice)" ng-class="{selected : choice.selected}">
+								<div class="col-md-12 block box">
+									<i class="choiceIcon {{choice.icon}}"></i>
+									<h5><b>{{::choice.display}}</b></h5>
+									<h6>{{::choice.description}}</h6>              
+								</div>
+							</div>
+						</div>
+					</div>
+					<form name="commentForm">
+						<label id="labelSurveyComments" class="labelSurveyComments" for="surveyComments">${gs.getMessage("Please share any comments/feedback")}</label>
+						<textarea id="surveyComments" class="surveyComments" name="comment" ng-model="surveyParams.comment" ng-required="true"></textarea>
+					</form>
+					<br></br>
+					<button type="button" class="btn btn-success btn-lg" ng-disabled="commentForm.comment.$error.required $[AMP]$[AMP] surveyParams.selectedReasonChoices.length == 0" ng-click="saveData(surveyParams, false)">${gs.getMessage("Send")}<i class="sendIcon glyphicon glyphicon-send"></i></button>
+				</div>
+			</div>
+			<div class="footerNewLayout">
+				<div class="hrefIcons">
+					<a href="https://www.facebook.com/abinbev" target="_blank" rel="noopener" class="linkIcons"><img title="" src="facebook.png" style="filter: invert(100%);" alt="" width="20" height="20" align="center" border="" hspace="" vspace="" /></a>
+					<a href="https://twitter.com/abinbev" target="_blank" rel="noopener" class="linkIcons"><img title="" src="twitter.png" style="filter: invert(100%);" alt="" width="20" height="20" align="center" border="" hspace="" vspace="" /></a>
+					<a href="https://www.youtube.com/user/ABInBevNews" target="_blank" rel="noopener" class="linkIcons"><img title="" src="youtube.png" style="filter: invert(100%);" alt="" width="20" height="20" align="center" border="" hspace="" vspace="" /></a>
+					<a href="https://www.linkedin.com/company/ab-inbev" target="_blank" rel="noopener" class="linkIcons"><img title="" src="linkedin.png" alt="" width="20" height="20" align="center" border="" hspace="" vspace="" style="margin-top: -5px; filter: invert(100%);" /></a>
+				</div>
+				<div class="footer">
+					<span class="footerSpan">© ABInBev - All rights reserved</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Actual survey include frame. -->
+		<iframe id="one_click_actual_survey"
+				style="width: 100%; height: 100%; border: none; overflow: hidden;"
+				ng-show="takeToActualSurvey"></iframe>
+
+	</div>
+</j:jelly>]]></html>
+        <name>QuickSurvey</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-24 18:25:04</sys_created_on>
+        <sys_id>0d1ba2c6db7218d0faa711494b96193c</sys_id>
+        <sys_mod_count>127</sys_mod_count>
+        <sys_name>QuickSurvey</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_ui_page_0d1ba2c6db7218d0faa711494b96193c</sys_update_name>
+        <sys_updated_by>Daniel.Dias-ext@ab-Inbev.com</sys_updated_by>
+        <sys_updated_on>2021-04-01 20:32:18</sys_updated_on>
+    </sys_ui_page>
+</record_update>

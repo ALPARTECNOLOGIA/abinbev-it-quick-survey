@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="click_metric" label="Click metric" language="en" table="x_anbib_survey_setup">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>click_metric</element>
+            <help/>
+            <hint/>
+            <label>Click metric</label>
+            <language>en</language>
+            <name>x_anbib_survey_setup</name>
+            <plural>Click metrics</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+            <sys_created_on>2020-08-25 13:06:27</sys_created_on>
+            <sys_id>72235bd41b8f98504a803150cd4bcb7d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Click metric</sys_name>
+            <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+            <sys_update_name>sys_documentation_x_anbib_survey_setup_click_metric_en</sys_update_name>
+            <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+            <sys_updated_on>2020-08-25 13:06:27</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

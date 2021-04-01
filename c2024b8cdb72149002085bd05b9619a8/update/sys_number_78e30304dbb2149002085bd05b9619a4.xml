@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_number">
+    <sys_number action="INSERT_OR_UPDATE">
+        <category display_value="" name="x_anbib_survey_setup">x_anbib_survey_setup</category>
+        <maximum_digits>7</maximum_digits>
+        <number>1000</number>
+        <prefix>SRVST</prefix>
+        <sys_class_name>sys_number</sys_class_name>
+        <sys_created_by>Marcos.Santos-ext@ab-Inbev.com</sys_created_by>
+        <sys_created_on>2020-08-18 14:18:06</sys_created_on>
+        <sys_id>78e30304dbb2149002085bd05b9619a4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SRVST</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_number_78e30304dbb2149002085bd05b9619a4</sys_update_name>
+        <sys_updated_by>Marcos.Santos-ext@ab-Inbev.com</sys_updated_by>
+        <sys_updated_on>2020-08-18 14:18:06</sys_updated_on>
+    </sys_number>
+</record_update>

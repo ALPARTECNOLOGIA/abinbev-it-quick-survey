@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="db_image">
+    <db_image action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category/>
+        <format>png</format>
+        <height>106</height>
+        <image>cc6db322db725410faa711494b9619d6</image>
+        <name>survey_very_satisfied.png</name>
+        <size_bytes>5569</size_bytes>
+        <sys_class_name>db_image</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-26 12:49:50</sys_created_on>
+        <sys_id>8adbf7aadb325410faa711494b9619a3</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>survey_very_satisfied.png</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>db_image_8adbf7aadb325410faa711494b9619a3</sys_update_name>
+        <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2020-08-26 12:54:07</sys_updated_on>
+        <thumbnail/>
+        <width>93</width>
+    </db_image>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color>#339966</average_image_color>
+        <chunk_size_bytes>700000</chunk_size_bytes>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>image</file_name>
+        <hash>dee640e9d8698b836f1f9f6513c6615e4d16c7453f8dc904e9e2878b650ff60e</hash>
+        <image_height>106</image_height>
+        <image_width>93</image_width>
+        <size_bytes>5569</size_bytes>
+        <size_compressed>5592</size_compressed>
+        <state>available</state>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-26 12:54:07</sys_created_on>
+        <sys_id>cc6db322db725410faa711494b9619d6</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2020-08-26 12:54:07</sys_updated_on>
+        <table_name>ZZ_YYdb_image</table_name>
+        <table_sys_id>8adbf7aadb325410faa711494b9619a3</table_sys_id>
+        <u_active_incident>false</u_active_incident>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="image" sys_id="cc6db322db725410faa711494b9619d6">cc6db322db725410faa711494b9619d6</sys_attachment>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-26 12:54:07</sys_created_on>
+        <sys_id>006db322db725410faa711494b9619d7</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>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</data>
+        <length>7444</length>
+        <position>1</position>
+        <sys_attachment display_value="image" sys_id="cc6db322db725410faa711494b9619d6">cc6db322db725410faa711494b9619d6</sys_attachment>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-26 12:54:07</sys_created_on>
+        <sys_id>806db322db725410faa711494b9619d7</sys_id>
+    </sys_attachment_doc>
+</record_update>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_policy_action">
+    <sys_ui_policy_action action="INSERT_OR_UPDATE">
+        <cleared>false</cleared>
+        <disabled>ignore</disabled>
+        <field>click_metric</field>
+        <mandatory>true</mandatory>
+        <sys_class_name>sys_ui_policy_action</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-25 14:08:50</sys_created_on>
+        <sys_id>f8e44b1adb7a1010faa711494b961945</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>click_metric</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_ui_policy_action_f8e44b1adb7a1010faa711494b961945</sys_update_name>
+        <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2020-08-25 14:08:50</sys_updated_on>
+        <table>x_anbib_survey_setup</table>
+        <ui_policy display_value="ALP: Mandatory fields">f1b4031adb7a1010faa711494b96191a</ui_policy>
+        <visible>ignore</visible>
+    </sys_ui_policy_action>
+</record_update>

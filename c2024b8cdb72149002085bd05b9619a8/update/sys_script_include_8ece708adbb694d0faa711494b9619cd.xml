@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_anbib_survey.QuickSurveyPersistence</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>QuickSurveyPersistence</name>
+        <script><![CDATA[var QuickSurveyPersistence = Class.create();
+QuickSurveyPersistence.prototype = {
+	initialize: function() {
+
+	},
+
+	STATES: {
+		READY: 'ready',
+		IN_PROGRESS: 'wip',
+		COMPLETE: 'complete',
+		CANCELLED: 'canceled'
+	},
+
+	logs: new global.LogGenerator("itsm", "[GLOBAL] - QuickSurveyPersistence"),
+
+	getRecordSurvey: function (record) {
+		var grSurvey = new GlideRecord('asmt_assessment_instance');
+		grSurvey.addEncodedQuery('task_id=' + record.getUniqueValue());
+		grSurvey.query();
+		if(grSurvey.next()){
+			return grSurvey;
+		}else{
+			return false;
+		}
+	},
+
+	getQuickSurveyUrl: function (survey, configId) {
+		if(survey){
+			var grSetup = new GlideRecord('x_anbib_survey_setup');
+			if (grSetup.get(configId))
+				return grSetup;
+			else{
+				grSetup = new GlideRecord('x_anbib_survey_setup');
+				grSetup.addEncodedQuery('asmt_metric_type=' + this.getGrValue(survey, 'metric_type')
+										+ '^asmt_key='+configId);
+				grSetup.query();
+				if (grSetup.next()) {
+					return grSetup;
+				}
+			}
+		} else{
+			return false;
+		}
+	},
+
+	saveSurveyInstance: function (surveyId, valueObj) {
+		valueObj = valueObj || {};
+		var grAssmtIn = this.getSurveyGr(surveyId);
+		if (grAssmtIn) {
+			if(grAssmtIn.state == this.STATES.COMPLETE) return false;
+			var dateTimeStr = new GlideDateTime().toString();
+
+			var grAssmtInQues = new GlideRecord('asmt_assessment_instance_question');
+			grAssmtInQues.addQuery('instance', grAssmtIn.getUniqueValue());
+			grAssmtInQues.addQuery('metric', 'IN', Object.keys(valueObj));
+			grAssmtInQues.query();
+			while (grAssmtInQues.next()) {
+				var metric = grAssmtInQues.metric.getRefRecord();
+				var surveyValue = valueObj[metric.getUniqueValue()];
+				var surveyValueField = this._getMetricValueField(this.getGrValue(metric, 'datatype'));
+				grAssmtInQues[surveyValueField] = surveyValue;
+				grAssmtInQues.update();
+			}
+			grAssmtIn.setValue('state', this.STATES.COMPLETE);
+			grAssmtIn.setValue('taken_on', dateTimeStr);
+			grAssmtIn.update();
+
+			return true;
+		}
+		return false;
+	},
+
+	reopenSurveyInstance: function (surveyId) {
+		var grAssmtIn = new GlideRecord('asmt_assessment_instance');
+		if (grAssmtIn.get(surveyId)) {
+			grAssmtIn.setValue('state', this.STATES.READY);
+			grAssmtIn.update();
+			return {
+				reopen_success: true
+			};
+		}
+		return {
+			reopen_success: false,
+			error: this._getError(404, 'Request to open invalid assessment')
+		};
+	},
+
+	getGrValue: function (gr, fieldPath, isDisplayValue) {
+		fieldPath = fieldPath || '';
+		fieldPath = fieldPath.split('.');
+		var val = null;
+		for (var i = 0; i < fieldPath.length; i++) {
+			if (i == fieldPath.length - 1) {
+				switch (gr[fieldPath[i]].getED().getInternalType()) {
+					case 'boolean':
+						val = gr[fieldPath[i]] == true;
+						break;
+					default:
+						if (isDisplayValue)
+							val = gr.getDisplayValue(fieldPath[i]);
+						else
+							val = gr.getValue(fieldPath[i]);
+				}
+			} else {
+				gr = gr[fieldPath[i]].getRefRecord();
+			}
+		}
+		return val;
+	},
+
+	getSurveyGr: function (surveyId) {
+		var grSurvey = new GlideRecord('asmt_assessment_instance');
+		if (grSurvey.get(surveyId))
+			return grSurvey;
+		return false;
+	},
+
+	getQuestionGr: function(metric, grAssmtIn){
+		var grAssmtInQues = new GlideRecord('asmt_assessment_instance_question');
+		//query for comments metric that appears when is Not Satisfied, Very Not Satisfied
+		grAssmtInQues.addEncodedQuery('instance=' + grAssmtIn.getUniqueValue() + '^metric=' + metric);
+		grAssmtInQues.query();
+		if(grAssmtInQues.next()){
+			return grAssmtInQues;
+		}
+		return false;
+	},
+
+	getGrRefRecord: function (gr, fieldPath) {
+		fieldPath = fieldPath || '';
+		fieldPath = fieldPath.split('.');
+		for (var i = 0; i < fieldPath.length; i++) {
+			gr = gr[fieldPath[i]];
+		}
+		return gr.getRefRecord();
+	},
+
+	getInlineMetricData: function (inlineMetrics, assmtMetricId) {
+		var inlines = {
+			"valid":'',
+			"validAssessment" : '',
+			"active":''
+		};
+		var grInlineMetrics = new GlideRecord('asmt_metric');
+		grInlineMetrics.addQuery('sys_id', 'IN', inlineMetrics);
+		grInlineMetrics.query();
+		if (+grInlineMetrics.getRowCount() != inlineMetrics.length)
+			inlines.valid = false;
+		while (grInlineMetrics.next()) {
+			inlines.validAssessment = inlines.validAssessment && (persistence.getGrValue(grInlineMetrics, 'metric_type') == assmtMetricId);
+			inlines.active = inlines.active && persistence.getGrValue(grInlineMetrics, 'active');
+		}
+		return inlines;
+	},
+
+	getConfigGr: function (configId) {
+		var grSetup = new GlideRecord('x_anbib_survey_setup');
+		if (grSetup.get(configId))
+			return grSetup;
+		return false;
+	},
+
+	getMetricDefinitionId : function(metric, value){
+		var grMetDef = new GlideRecord('asmt_metric_definition');
+		grMetDef.addEncodedQuery('metric=' + metric + '^value=' + value);
+		grMetDef.query();
+
+		if(grMetDef.next()) return grMetDef.getUniqueValue();
+		else return '';
+	},
+
+	getSurveyStatusObj: function (grAssmtIn, grAssmtConfig) {
+		/* Generate survey object */
+		var survey = {};
+		if (grAssmtIn && grAssmtIn.isValidRecord()) {
+			survey.valid = true;
+			survey.id = grAssmtIn.getUniqueValue();
+			survey.userId = this.getGrValue(grAssmtIn, 'user');
+			survey.state = this.getGrValue(grAssmtIn, 'state');
+			survey.metric = this.getGrValue(grAssmtIn, 'metric_type');
+			survey.due_date = this.getGrValue(grAssmtIn, 'due_date');
+			survey.expiration_date = this.getGrValue(grAssmtIn, 'expiration_date');
+			var commentMetric;
+			var reasonChoicesMetric;
+			var incidentSurvey = gs.getProperty('incident_satisfatory_survey');
+
+			//check if is Incident Survey or Requested Item Survey
+			if(grAssmtConfig.asmt_metric_type == incidentSurvey){ 
+				commentMetric = gs.getProperty('x_anbib_survey.comment_metric_incidentSurvey');
+				reasonChoicesMetric = gs.getProperty('x_anbib_survey.reasons_metric_incidentSurvey');
+			}else{
+				commentMetric = gs.getProperty('x_anbib_survey.comment_metric_reqItemSurvey');
+				reasonChoicesMetric = gs.getProperty('x_anbib_survey.reasons_metric_reqItemSurvey');
+			}
+			
+			survey.commentSubmitted = this._checkIfHasStringValue(grAssmtIn, commentMetric);
+			survey.reasonChoicesSubmitted = this._checkIfHasStringValue(grAssmtIn, reasonChoicesMetric);
+
+			//Check if instance is already complete
+			if(grAssmtIn.state != this.STATES.COMPLETE){
+				var clickValue = this.getGrValue(grAssmtConfig, 'click_value');
+				survey.click_value = clickValue;
+			}else{
+				var evaluateMetric = this.getGrValue(grAssmtConfig, 'click_metric');
+				var grQuestion = this.getQuestionGr(evaluateMetric,grAssmtIn);
+				survey.click_value = grQuestion.getValue('value');
+			}
+
+		}
+
+		/* Generate config object */
+		var config = {};
+		if (grAssmtConfig && grAssmtConfig.isValidRecord()) {
+			config.valid = true;
+			config.id = grAssmtConfig.getUniqueValue();
+			config.metric = this.getGrValue(grAssmtConfig, 'asmt_metric_type');
+			config.click_metric = this.getGrValue(grAssmtConfig, 'click_metric');
+			config.click_value = this.getGrValue(grAssmtConfig, 'click_value');
+			config.click_metric_active = this.getGrValue(grAssmtConfig, 'click_metric.active');
+			config.save_without_inline = this.getGrValue(grAssmtConfig, 'save_without_inline');
+			config.show_inline_metric = this.getGrValue(grAssmtConfig, 'show_inline_metric');
+			config.inline_metrics = this.getGrValue(grAssmtConfig, 'inline_metrics');
+			config.show_complete_survey = this.getGrValue(grAssmtConfig, 'show_complete_survey');
+
+			var messages = {};
+			messages.click_message = this.getGrValue(grAssmtConfig, 'click_message');
+			messages.inline_message = this.getGrValue(grAssmtConfig, 'inline_message');
+			messages.success_message = this.getGrValue(grAssmtConfig, 'success_message');
+			messages.error_message = this.getGrValue(grAssmtConfig, 'error_message');
+
+			/*
+			Switch to default messages if not found.
+			Match the UI messages for translation
+			*/
+
+			// 			for (var o in messages) {
+			// 				if (!messages[o] || messages[o] == '')
+			// 					messages[o] = this.getProperty(this._getMessagePropertySuffix(o));
+			// 				messages[o] = gs.getMessage(messages[o]);
+			// 			}
+
+			config.messages = messages;
+		}
+
+		/* Fetch inline metrics */
+		var inlines = null;
+		if (config.show_inline_metric)
+			inlines = this._fetchInlineMetrics(survey.id, config.inline_metrics);
+
+		/* Process errors */
+		var error = this._getErrors(survey, config, inlines);
+
+		return {
+			survey: survey,
+			config: config,
+			inlines: inlines,
+			error: error
+		};
+	},
+
+	_checkIfHasStringValue : function(grAssmtIn, metric){
+		var grAssmtInQues = new GlideRecord('asmt_assessment_instance_question');
+		//query for comments metric that appears when is Not Satisfied, Very Not Satisfied
+		grAssmtInQues.addEncodedQuery('instance=' + grAssmtIn.getUniqueValue() + '^metric=' + metric);
+		grAssmtInQues.query();
+		if(grAssmtInQues.next()){
+			if(grAssmtInQues.string_value == '') return false;
+			else return true;
+		}
+	},
+
+	saveComment : function(grAssmtIn,comment,commentMetric){
+		//check if comment is not empty
+		if(comment != ''){
+			var grAssmtInQues = new GlideRecord('asmt_assessment_instance_question');
+			grAssmtInQues.addEncodedQuery('instance=' + grAssmtIn.getUniqueValue() + '^metric=' + commentMetric);
+			grAssmtInQues.query();
+
+			if(grAssmtInQues.next()){
+				grAssmtInQues.string_value = comment;
+				grAssmtInQues.update();
+				return true;
+			}else
+				return false;
+
+		}else
+			return false;
+
+	},
+
+	saveChoices : function(grAssmtIn,grAssmtConfig,choices,reasonChoicesMetric){
+		var choicesLength = choices.length;
+		if(choicesLength > 0){
+			var grQuesCopy;
+			for(var i=0; i < choicesLength; i++){
+				//if is the first choice, already have an record to update
+				if(i == 0){
+					var grAssmtInQues = new GlideRecord('asmt_assessment_instance_question');
+					grAssmtInQues.addEncodedQuery('instance=' + grAssmtIn.getUniqueValue() + '^metric=' + reasonChoicesMetric);
+					grAssmtInQues.query();
+
+					if(grAssmtInQues.next()){
+						grQuesCopy = grAssmtInQues;
+
+						grAssmtInQues.value = choices[i].value;
+						grAssmtInQues.string_value = choices[i].description;
+						grAssmtInQues.metric_definition = this.getMetricDefinitionId(reasonChoicesMetric, choices[i].value);
+						grAssmtInQues.update();
+					}
+				}else{
+					//if is not the first choice, needs to create an record to this choice
+					var grAssmtInQuesNew = new GlideRecord('asmt_assessment_instance_question');
+					grAssmtInQuesNew.initialize();
+					grAssmtInQuesNew = grQuesCopy;
+					grAssmtInQuesNew.metric_definition = this.getMetricDefinitionId(reasonChoicesMetric, choices[i].value);
+					grAssmtInQuesNew.value = choices[i].value;
+					grAssmtInQuesNew.string_value = choices[i].description;
+
+
+					grAssmtInQuesNew.insert();
+				}
+			}
+
+			return true;
+
+		}else{
+
+			return false;
+
+		}
+
+	},
+
+	_getMessagePropertySuffix: function (messageDefaultFieldName) {
+		if (messageDefaultFieldName && messageDefaultFieldName != '')
+			return 'message.default_' +
+				messageDefaultFieldName.substring(0, messageDefaultFieldName.indexOf('_message'));
+	},
+
+	_getMetricValueField: function (metricDatatype) {
+		metricDatatype = metricDatatype || '';
+		switch (metricDatatype) {
+			case 'string':
+				return 'string_value';
+		}
+		return 'value';
+	},
+
+	_getErrors: function (survey, config, inlines) {
+		/* Check error based on validity */
+		if (!survey.valid)
+			return this._getError(510, 'Invalid survey');
+
+		/* Check error based on user */
+		if (survey.userId != gs.getUserID())
+			return this._getError(401, 'You are not authorized to take this Survey');
+
+		/* Check error based on state */
+		if (survey.state == this.STATES.CANCELLED)
+			return this._getError(508, 'The survey is cancelled');
+		if (survey.state == this.STATES.COMPLETE && (survey.commentSubmitted || survey.reasonChoicesSubmitted))
+			return this._getError(508, 'The survey is already completed');
+		if (survey.state == this.STATES.COMPLETE && (!survey.commentSubmitted || !survey.reasonChoicesSubmitted))
+			return this._getError(509, 'Your evaluation has already been made, and it was this below :');
+
+		/* Check error based on config */
+		if (survey.metric != config.metric)
+			return this._getError(409, 'The survey is conflicting with the configuration');
+
+		if (!config.click_metric_active)
+			return this._getError(406, 'Survey cannot be performed on disabled metric');
+	},
+
+	_getError: function (code, message) {
+		return {
+			code: code,
+			message: gs.getMessage(message)
+		};
+	},
+
+	type: 'QuickSurveyPersistence'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-24 09:44:42</sys_created_on>
+        <sys_id>8ece708adbb694d0faa711494b9619cd</sys_id>
+        <sys_mod_count>52</sys_mod_count>
+        <sys_name>QuickSurveyPersistence</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_script_include_8ece708adbb694d0faa711494b9619cd</sys_update_name>
+        <sys_updated_by>pedro.torres@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2021-03-10 14:02:36</sys_updated_on>
+    </sys_script_include>
+</record_update>

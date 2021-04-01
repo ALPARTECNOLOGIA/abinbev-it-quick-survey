@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_email">
+    <sys_script_email action="INSERT_OR_UPDATE">
+        <name>quick_survey_assesment_buttons</name>
+        <new_lines_to_html>false</new_lines_to_html>
+        <script><![CDATA[(function runMailScript(/* GlideRecord */ current, /* TemplatePrinter */ template,
+										   /* Optional EmailOutbound */ email, /* Optional GlideRecord */ email_action,
+										   /* Optional GlideRecord */ event) {
+
+	var prefix = current.sys_class_name.toString() == 'incident' ? 'inc_' : 'ritm_';
+	
+	var smileyVerySatisfied = {
+		"image":'survey_very_satisfied.png',
+		"key": prefix + "surv_rate_10"
+	};
+	var smileySatisfied = {
+		"image":'survey_satisfied.png',
+		"key": prefix + "surv_rate_9"
+	};
+	var smileyOk = {
+		"image":'survey_ok.png',
+		"key": prefix + "surv_rate_7"
+	};
+	var smileyNotSatisfied = {
+		"image":'survey_not_satisfied.png',
+		"key": prefix + "surv_rate_3"
+	};
+	var smileyVeryNotSatisfied = {
+		"image":'survey_very_not_satisfied.png',
+		"key": prefix + "surv_rate_1"
+	};	
+
+	var facesArray = [smileyVerySatisfied,smileySatisfied,smileyOk,smileyNotSatisfied,smileyVeryNotSatisfied];
+
+	var smileyHeight = 106;
+	var smileyWidth = 93;
+	//var happySurveyKey = 'sabm_inc_req_happy';
+	//var unhappySurveyKey = 'sabm_inc_req_unhappy';
+	var clickSurvey = new x_anbib_survey.QuickSurveyUtils();
+	//var happyLink = clickSurvey.getQuickSurveyUrl(current, happySurveyKey);
+	//var unhappyLink = clickSurvey.getQuickSurveyUrl(current, unhappySurveyKey);
+
+	var str = '';
+
+	facesArray.forEach(function(face){
+		var link =clickSurvey.getQuickSurveyUrl(current, face.key);
+
+		str += '<a href="' + link + '">' +
+			'<img width="' + smileyWidth + '"' + ' ' +
+			'height="' + smileyHeight + '"' + ' ' +
+			'src="'+ face.image +'" />' +
+			'</a>';
+
+		str += '&nbsp;&nbsp;';
+	});
+
+	str = '<div>' + str + '</div>';
+
+	template.print(str);
+
+})(current, template, email, email_action, event);]]></script>
+        <sys_class_name>sys_script_email</sys_class_name>
+        <sys_created_by>lucas.simoes@alparservice.com.br</sys_created_by>
+        <sys_created_on>2020-08-24 18:27:29</sys_created_on>
+        <sys_id>7c263e86db3618d0faa711494b96198e</sys_id>
+        <sys_mod_count>11</sys_mod_count>
+        <sys_name>quick_survey_assesment_buttons</sys_name>
+        <sys_package display_value="Quick Survey" source="x_anbib_survey">c2024b8cdb72149002085bd05b9619a8</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Quick Survey">c2024b8cdb72149002085bd05b9619a8</sys_scope>
+        <sys_update_name>sys_script_email_7c263e86db3618d0faa711494b96198e</sys_update_name>
+        <sys_updated_by>lucas.simoes@alparservice.com.br</sys_updated_by>
+        <sys_updated_on>2020-08-31 18:24:04</sys_updated_on>
+    </sys_script_email>
+</record_update>

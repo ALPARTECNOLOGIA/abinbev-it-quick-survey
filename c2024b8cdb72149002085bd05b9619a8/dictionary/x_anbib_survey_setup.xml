@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element label="Quick Survey" max_length="40" name="x_anbib_survey_setup" sizeclass="10" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Assessment key" max_length="120" name="asmt_key" type="string"/>
+        <element attributes="encode_utf8=false" label="Assessment type" max_length="32" name="asmt_metric_type" reference="asmt_metric_type" type="reference"/>
+        <element label="Click Message" max_length="100" name="click_message" type="string"/>
+        <element label="Click metric" max_length="32" name="click_metric" reference="asmt_metric" reference_qual="javascript: 'metric_type=' + current.asmt_metric_type" type="reference" use_reference_qualifier="advanced"/>
+        <element label="Click metric value" max_length="100" name="click_value" type="string"/>
+        <element label="Error message" max_length="100" name="error_message" type="string"/>
+        <element label="Inline section message" max_length="100" name="inline_message" type="string"/>
+        <element label="Inline Metrics" max_length="4000" name="inline_metrics" reference="asmt_metric" reference_qual="javascript: 'metric_type=' + current.asmt_metric_type" type="glide_list" use_reference_qualifier="advanced"/>
+        <element attributes="edge_encryption_enabled=true" label="Name" max_length="120" name="name" type="string"/>
+        <element label="Immediate save" max_length="40" name="save_without_inline" type="boolean"/>
+        <element label="Can take complete survey" max_length="40" name="show_complete_survey" type="boolean"/>
+        <element label="Show inline metrics" max_length="40" name="show_inline_metric" type="boolean"/>
+        <element label="Success message" max_length="100" name="success_message" type="string"/>
+        <index name="index">
+            <element name="asmt_metric_type"/>
+        </index>
+        <index name="index2">
+            <element name="click_metric"/>
+        </index>
+    </element>
+</database>
